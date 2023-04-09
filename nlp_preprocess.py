@@ -9,10 +9,13 @@ from nltk.corpus import stopwords
 from num2words import num2words
 import nltk
 
+import csv
+
 nltk.download('punkt')
 nltk.download('stopwords')
 nltk.download('wordnet')
 
+ISW_REPORTS_CSV = "isw_reports.csv"
 
 def remove_date(data):
     data = data.read().splitlines(True)
@@ -117,18 +120,28 @@ def preprocess(data, word_root_algo ="lemm"):
 
     return data
 
-def write_vector_to_file(file_name,text):
+def write_vectors_to_file(text):
     if(not os.path.exists("vectors")):
         os.makedirs("vectors")
-    with open(f'vectors/{file_name}', 'w', encoding = "utf-8") as file:
-        file.write(text)
+    header = ['report_date','vector']
+    with open(f'data_sources/{ISW_REPORTS_CSV}', 'w', encoding = "utf-8", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow(header)
+        writer.writerows(text)
+
+csv_data = []
 
 for i in os.listdir("isw_reports"):
     if i.startswith("ISW"):
-        with open(i, "r") as f:
+        print(i)
+        with open(f'isw_reports/{i}', "r",encoding = "utf-8") as f:
             data = remove_date(f)
             vector = preprocess(data)
-        write_vector_to_file(i, vector)
+            date = i[4:14]
+            row = [date, vector]
+            csv_data.append(row)
+
+write_vectors_to_file(csv_data)
 
 
 
