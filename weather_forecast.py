@@ -4,7 +4,7 @@ import requests
 import datetime
 import matplotlib.pyplot as plt
 
-API_KEY = 'PXAMV42AU6LKXV828GP3UCWGH'
+API_KEY = ''
 CITY = "KYIV"
 UNIT_GROUP = "metric"
 COUNTRY= "UKRAINE"
