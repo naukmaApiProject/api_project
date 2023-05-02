@@ -1,9 +1,6 @@
 import datetime as dt
-import json
-import requests
 import os
 import json
-import predictions_builder as pb
 from flask import Flask, jsonify, request
 
 API_TOKEN = "authtoken"
