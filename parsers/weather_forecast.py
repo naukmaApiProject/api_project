@@ -4,7 +4,7 @@ import requests
 import datetime
 import matplotlib.pyplot as plt
 
-API_KEY = ''
+API_KEY = os.getenv("WEATHER_API_KEY")
 CITY = "KYIV"
 UNIT_GROUP = "metric"
 COUNTRY= "UKRAINE"
@@ -37,9 +37,9 @@ def parse_json_response(response_json, current_hour):
     return dict(map(lambda dataObject: (str(dataObject['datetime']).split(":")[0], dataObject['temp']), data))
 
 def write_report_to_file(data):
-    if(not os.path.exists("weather_forecasts")):
-        os.makedirs("weather_forecasts")
-    with open(f'weather_forecasts/{str(datetime.datetime.now())}', 'w', encoding = "utf-8") as file:
+    if(not os.path.exists("/app/data/weather_forecasts")):
+        os.makedirs("/app/data/weather_forecasts")
+    with open(f'/app/data/weather_forecasts/{str(datetime.datetime.now())}', 'w', encoding = "utf-8") as file:
         for i in data:
             file.write(str(i))
 
@@ -63,4 +63,4 @@ else:
     response = get_forecast()
 
 data = parse_json_response(response.json(), current_hour)
-visualize(data)
+write_report_to_file(data)

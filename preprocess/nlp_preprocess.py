@@ -121,8 +121,8 @@ def preprocess(data, word_root_algo ="lemm"):
     return data
 
 def write_vectors_to_file(text):
-    if(not os.path.exists("vectors")):
-        os.makedirs("vectors")
+    if(not os.path.exists("../data/vectors")):
+        os.makedirs("../data/vectors")
     header = ['report_date','vector']
     with open(f'data_sources/{ISW_REPORTS_CSV}', 'w', encoding = "utf-8", newline="") as file:
         writer = csv.writer(file)
@@ -131,10 +131,10 @@ def write_vectors_to_file(text):
 
 csv_data = []
 
-for i in os.listdir("isw_reports"):
+for i in os.listdir("../data/isw_reports"):
     if i.startswith("ISW"):
         print(i)
-        with open(f'isw_reports/{i}', "r",encoding = "utf-8") as f:
+        with open(f'data/isw_reports/{i}', "r", encoding ="utf-8") as f:
             data = remove_date(f)
             vector = preprocess(data)
             date = i[4:14]
