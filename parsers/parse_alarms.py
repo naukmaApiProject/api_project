@@ -16,7 +16,7 @@ from datetime import datetime
 import calendar
 # %matplotlib inline
 
-data = pd.read_csv('data/convertcsv.csv', sep=';', parse_dates=['start', 'end', 'clean_end'])
+data = pd.read_csv('/app/data/convertcsv.csv', sep=';', parse_dates=['start', 'end', 'clean_end'])
 
 
 print(data.head())
