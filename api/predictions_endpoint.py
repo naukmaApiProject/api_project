@@ -5,7 +5,7 @@ from flask import Flask, jsonify, request
 
 API_TOKEN = "authtoken"
 LAST_MODEL_TRAINED = dt(2023, 4, 24, 16, 20, 0)
-PREDICTIONS_PATH = "predictions/"
+PREDICTIONS_PATH = "/app/data/predictions/"
 
 
 app = Flask(__name__)
