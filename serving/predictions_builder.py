@@ -2,11 +2,11 @@ import os
 
 import requests
 from datetime import datetime, timedelta
+from tensorflow import keras
 import pickle
 import json
 
-API_KEY = ''
-MODEL_FILE = 'model/model.pkl'
+API_KEY = 'PXAMV42AU6LKXV828GP3UCWGH'
 
 regions = ["Kyiv", "Vinnytsia", "Lutsk", "Dnipro", "Donetsk", "Zhytomyr", "Uzhhorod", 
            "Zaporizhzhia", "Ivano-Frankivsk", "Kropyvnytskyi", "Luhansk", "Lviv", "Mykolaiv", 
@@ -18,10 +18,22 @@ def get_forecast(city, date_from, date_to):
                         f"{city}/{date_from}/{date_to}?unitGroup=metric&key={API_KEY}")
     if response.status_code == 200:
         return response.json()
-    
+
+def get_last_model(directory) :
+    # Get a list of all files in the directory
+    files = os.listdir(directory)
+
+    # Sort the list of files by creation time in descending order
+    files.sort(key=lambda x: os.path.getctime(os.path.join(directory, x)), reverse=True)
+
+    # Get the name of the most recently created file
+    #return files[0]
+    return "/home/vampir/lolitech/api/api_project/data/models/model1-2.h5"
+
 def build_predictions():
-    with open(MODEL_FILE, 'rb') as file:
-        model = pickle.load(file)
+    with open(get_last_model("/home/vampir/lolitech/api/api_project/data/models"), 'rb') as file:
+        model = keras.models.load_model('/home/vampir/lolitech/api/api_project/data/models/model1-2.h5')
+        #model = pickle.load(file)
     
     prediction_date = datetime.today()
 
@@ -58,7 +70,7 @@ def build_region_prediction(region, model, prediction_date):
     save_prediction(prediction, region)
 
 def save_prediction(prediction, region):
-    with open(f"predictions/{str(region)}.json", "w") as f:
+    with open(f"/home/vampir/lolitech/api/api_project/data/predictions/{str(region)}.json", "w") as f:
         json.dump(prediction,f)
 
 def get_dates(date):
