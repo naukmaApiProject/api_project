@@ -1,21 +1,31 @@
-import os
+import sys
+sys.path.append('.')
 
+import os
 import requests
-from datetime import datetime, timedelta
-from tensorflow import keras
+
 import pickle
 import json
+import numpy as np
+import random
+import time
+from tensorflow import keras
+from datetime import datetime, timedelta
+from utils.regions import get_region_id
 
 API_KEY = 'PXAMV42AU6LKXV828GP3UCWGH'
 
-regions = ["Kyiv", "Vinnytsia", "Lutsk", "Dnipro", "Donetsk", "Zhytomyr", "Uzhhorod", 
+MODEL_FILE = 'model/model2.h5'
+THRESHOLD = 0.5
+regions = ["Kyiv", "Vinnytsia", "Lutsk", "Dnipro", "Donetsk", "Zhytomyr", "Uzhhorod",
            "Zaporizhzhia", "Ivano-Frankivsk", "Kropyvnytskyi", "Luhansk", "Lviv", "Mykolaiv", 
            "Odesa", "Poltava", "Rivne", "Simferopol", "Sumy", "Ternopil", "Kharkiv", "Kherson", 
            "Khmelnytskyi", "Cherkasy", "Chernivtsi", "Chernihiv"];
 
 def get_forecast(city, date_from, date_to):
-    response = requests.get(f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/"
-                        f"{city}/{date_from}/{date_to}?unitGroup=metric&key={API_KEY}")
+    url = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{city},Ukraine/{date_from}/{date_to}?unitGroup=metric&key={API_KEY}";
+    print(url)
+    response = requests.get(url)
     if response.status_code == 200:
         return response.json()
 
@@ -31,43 +41,80 @@ def get_last_model(directory) :
     return "/home/vampir/lolitech/api/api_project/data/models/model1-2.h5"
 
 def build_predictions():
-    with open(get_last_model("/home/vampir/lolitech/api/api_project/data/models"), 'rb') as file:
-        model = keras.models.load_model('/home/vampir/lolitech/api/api_project/data/models/model1-2.h5')
-        #model = pickle.load(file)
-    
+    model = keras.models.load_model(MODEL_FILE, compile=False)
     prediction_date = datetime.today()
-
     for region in regions:
         build_region_prediction(region, model, prediction_date)
 
 def build_region_prediction(region, model, prediction_date):
+    #get next 12 hours date range
     dates = get_dates(prediction_date)
     weather = get_forecast(region, dates[0].strftime('%Y-%m-%d'), dates[1].strftime('%Y-%m-%d'))
-
     curr_date = dates[0]
     curr_hour = curr_date.hour
 
-    prediction = { str(region): {} , "last_prediction_time": prediction_date, }
+    prediction = { "last_prediction_time": prediction_date.strftime('%Y-%m-%d %H:%M:%S') }
+    prediction[region] = {}
+
+    input_data = [0] * 12
+    
+    #get data for 12 hours for particular region
     for i in range(12):
         day = 0 if curr_hour < 24 else 1
         hour = curr_date.hour
 
-        curr_weather = weather['days'][day]['hours'][hour]
-        hour_temp = curr_weather['temp']
-        hour_humidity = curr_weather['humidity']
-        hour_windspeed = curr_weather['windspeed']
-        hour_pressure = curr_weather['pressure']
+        date = curr_date.strftime('%Y-%m-%d')
+        date = datetime.strptime(date, '%Y-%m-%d')
 
-        input_data = [[hour_temp, hour_humidity, hour_windspeed, hour_pressure]]
-        # i need model params on this step
-        prediction = model.predict(input_data)
+        daily_weather = weather['days'][day]
+
+        curr_weather = daily_weather['hours'][hour]
+
+        #model input variables
+        date = date.timestamp()
+        day_temp_max = daily_weather['tempmax']
+        day_temp_min = daily_weather['tempmin']
+        day_temp = daily_weather['temp']
+        day_temp2 = float(time.time())
+        day_humidity = daily_weather['humidity']  
+        day_hour = float(hour)
+        hour_temp = curr_weather['temp']
+        hour_dew = curr_weather['dew']
+        hour_humidity = curr_weather['humidity']
+        m_region = get_region_id(region)
+
+
+        input_data[i] = [date,m_region,day_temp_max,day_temp_min,day_temp,day_temp2,day_humidity,day_hour,hour_temp,hour_humidity,hour_dew]
         curr_date = curr_date + timedelta(hours=1)
         curr_hour = curr_hour + 1
 
+    #normalize data    
+    mean = np.mean(input_data, axis=0)
+    std = np.std(input_data, axis=0)
+    std[std == 0] = 1e-6  #
+    #add a small value to prevent division by 0
+    eps = 1e-10
+    normalized_data = (input_data - mean) / (std + eps)
+    #predict
+    res = model.predict(normalized_data)
+
+    #write predictions to object
+    curr_date = dates[0]
+    curr_hour = curr_date.hour
+
+    for i in range(12):
+        day = 0 if curr_hour < 24 else 1
+        hour = curr_date.hour
+
         prediction_time = curr_date.strftime('%H:%M')
-        prediction[str(region)][str(prediction_time)] = prediction
+        alarm = True if res[i] >= THRESHOLD else False
+        print(alarm)
+        prediction[region][prediction_time] = alarm
+
+        curr_date = curr_date + timedelta(hours=1)
+        curr_hour = curr_hour + 1
     
-    save_prediction(prediction, region)
+    save_prediction(prediction,region)
 
 def save_prediction(prediction, region):
     with open(f"/home/vampir/lolitech/api/api_project/data/predictions/{str(region)}.json", "w") as f:

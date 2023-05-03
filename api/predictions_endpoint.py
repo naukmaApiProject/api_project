@@ -1,11 +1,22 @@
+import sys
+sys.path.append('.')
+
 import datetime as dt
+import json
+import requests
 import os
 import json
+from serving.predictions_builder import build_predictions
 from flask import Flask, jsonify, request
 
 API_TOKEN = "authtoken"
+<<<<<<< HEAD
 LAST_MODEL_TRAINED = dt(2023, 4, 24, 16, 20, 0)
 PREDICTIONS_PATH = "/app/data/predictions/"
+=======
+LAST_MODEL_TRAINED = dt.datetime(2023, 4, 24, 16, 20, 0)
+PREDICTIONS_PATH = "./predictions/"
+>>>>>>> e92c753b6cea72acf837eb7c337be64064315a49
 
 
 app = Flask(__name__)
@@ -15,7 +26,7 @@ def create_query_parameter(key: str, value: str):
 
 def get_prediction(region):
     response = {
-        "last_model_train_time": LAST_MODEL_TRAINED,
+        "last_model_train_time": LAST_MODEL_TRAINED.strftime("%Y-%m-%d %H:%M:%S"),
         "regions_forecast": {}
     }
 
@@ -38,9 +49,10 @@ def get_prediction(region):
             response["regions_forecast"][region] = json_data[region]
 
     response["last_prediction_time"] = last_updated
+    return response
 
 def authenticate(json_data):
-    if json_data.get("token") is None:
+    if json_data is None or json_data.get("token") is None:
         raise InvalidUsage("token is required", status_code=400)
 
     token = json_data.get("token")
@@ -71,28 +83,24 @@ def handle_invalid_usage(error):
     return response
 
 
-@app.route(
-    "/",
-    methods=["POST"]
-)
+@app.route("/api/update", methods=["POST"])
 def update():
     json_data = request.get_json()
     authenticate(json_data)
+    build_predictions()
+    return "updated!"
 
-@app.route("/api/update")
+@app.route("/",methods=["POST"])
 def home_page():
     return "<p><h1>Alarms API</h1></p>"
 
-@app.route(
-    "/api/predict",
-    methods=["POST"],
-)
+@app.route("/api/predict", methods=["POST"])
 def predictions_endpoint():
     json_data = request.get_json()
 
     authenticate(json_data)
 
-    if not json_data.get("region"):
+    if json_data.get("region") is None:
         raise InvalidUsage("You should specify the region or leave it blank to get prediction for all regions", status_code=400)
 
     region = json_data.get("region")
@@ -100,3 +108,6 @@ def predictions_endpoint():
     response = get_prediction(region)
 
     return response
+
+if __name__ == '__main__':
+    app.run()

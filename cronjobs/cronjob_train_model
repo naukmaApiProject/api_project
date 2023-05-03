@@ -1,0 +1,1 @@
+0 */1 * * * root python /app/serving/predictions_builder.py
