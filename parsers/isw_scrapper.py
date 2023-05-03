@@ -62,9 +62,9 @@ def parse_blocks(blocks):
     return '\n'.join(res)
 
 def write_report_to_file(text, date):
-    if(not os.path.exists("../data/isw_reports")):
-        os.makedirs("../data/isw_reports")
-    with open(f'isw_reports/ISW_{date}.txt', 'w', encoding = "utf-8") as file:
+    if(not os.path.exists("/app/data/isw_reports")):
+        os.makedirs("/app/data/isw_reports")
+    with open(f'/app/data/isw_reports/ISW_{date}.txt', 'w', encoding = "utf-8") as file:
         file.write(text)
 
 def main():
