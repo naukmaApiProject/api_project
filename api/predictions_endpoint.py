@@ -10,13 +10,8 @@ from serving.predictions_builder import build_predictions
 from flask import Flask, jsonify, request
 
 API_TOKEN = "authtoken"
-<<<<<<< HEAD
-LAST_MODEL_TRAINED = dt(2023, 4, 24, 16, 20, 0)
-PREDICTIONS_PATH = "/app/data/predictions/"
-=======
 LAST_MODEL_TRAINED = dt.datetime(2023, 4, 24, 16, 20, 0)
-PREDICTIONS_PATH = "./predictions/"
->>>>>>> e92c753b6cea72acf837eb7c337be64064315a49
+PREDICTIONS_PATH = "/app/data/predictions/"
 
 
 app = Flask(__name__)
@@ -88,9 +83,9 @@ def update():
     json_data = request.get_json()
     authenticate(json_data)
     build_predictions()
-    return "updated!"
+    return jsonify({"status" : "success"})
 
-@app.route("/",methods=["POST"])
+@app.route("/",methods=["GET"])
 def home_page():
     return "<p><h1>Alarms API</h1></p>"
 

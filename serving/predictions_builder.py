@@ -17,8 +17,10 @@ API_KEY = 'PXAMV42AU6LKXV828GP3UCWGH'
 
 MODEL_FILE = 'model/model2.h5'
 THRESHOLD = 0.5
-regions = ["Kyiv", "Vinnytsia", "Lutsk", "Dnipro", "Donetsk", "Zhytomyr", "Uzhhorod",
-           "Zaporizhzhia", "Ivano-Frankivsk", "Kropyvnytskyi", "Luhansk", "Lviv", "Mykolaiv", 
+MODEL_FILE = 'model/model2.h5'
+THRESHOLD = 0.5
+regions = ["Kyiv", "Vinnytsia", "Lutsk", "Dnipro", "Donetsk", "Zhytomyr", "Uzhhorod", 
+           "Zaporizhzhia", "Ivano-Frankivsk", "Kropyvnytskyi", "Luhansk", "Lviv", "Mykolaiv",
            "Odesa", "Poltava", "Rivne", "Simferopol", "Sumy", "Ternopil", "Kharkiv", "Kherson", 
            "Khmelnytskyi", "Cherkasy", "Chernivtsi", "Chernihiv"];
 
@@ -37,11 +39,11 @@ def get_last_model(directory) :
     files.sort(key=lambda x: os.path.getctime(os.path.join(directory, x)), reverse=True)
 
     # Get the name of the most recently created file
-    #return files[0]
-    return "/home/vampir/lolitech/api/api_project/data/models/model1-2.h5"
+    return directory + "/" + files[0]
 
 def build_predictions():
-    model = keras.models.load_model(MODEL_FILE, compile=False)
+    
+    model = keras.models.load_model(get_last_model("/app/data/models"), compile=False)
     prediction_date = datetime.today()
     for region in regions:
         build_region_prediction(region, model, prediction_date)
@@ -117,7 +119,7 @@ def build_region_prediction(region, model, prediction_date):
     save_prediction(prediction,region)
 
 def save_prediction(prediction, region):
-    with open(f"/home/vampir/lolitech/api/api_project/data/predictions/{str(region)}.json", "w") as f:
+    with open(f"/app/data/predictions/{str(region)}.json", "w") as f:
         json.dump(prediction,f)
 
 def get_dates(date):
