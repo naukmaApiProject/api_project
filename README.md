@@ -10,3 +10,5 @@ K8s way
 
 Docker way
 * to run ```docker run -p 5000:5000 vampir/api-app```
+
+P.S. Dont forget to apply env vars first !

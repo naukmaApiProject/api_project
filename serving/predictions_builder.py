@@ -4,16 +4,14 @@ sys.path.append('.')
 import os
 import requests
 
-import pickle
 import json
 import numpy as np
-import random
 import time
 from tensorflow import keras
 from datetime import datetime, timedelta
 from utils.regions import get_region_id
 
-API_KEY = 'PXAMV42AU6LKXV828GP3UCWGH'
+API_KEY = os.getenv("WEATHER_API_KEY")
 
 MODEL_FILE = 'model/model2.h5'
 THRESHOLD = 0.5
