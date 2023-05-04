@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api-app
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: api-app
+  template:
+    metadata:
+      labels:
+        app: api-app
+    spec:
+      containers:
+      - name: api-app
+        image: vampir/api-app:latest
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: FLASK_RUN_HOST
+          value: "0.0.0.0"
+        ports:
+        - containerPort: 5000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: my-app-service
+spec:
+  selector:
+    app: api-app
+  type: LoadBalancer
+  ports:
+    - name: http
+      port: 80
+      targetPort: 5000

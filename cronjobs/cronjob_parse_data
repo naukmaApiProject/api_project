@@ -1,1 +1,0 @@
-0 */12 * * * root python /app/parsers/weather_forecast.py && python /app/parsers/isw_scrapper.py
