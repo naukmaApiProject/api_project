@@ -19,6 +19,10 @@ spec:
         env:
         - name: FLASK_RUN_HOST
           value: "0.0.0.0"
+        - name: APP_AUTH_TOKEN
+          value: {{ .Values.app.auth_token }}
+        - name: WEATHER_API_KEY
+          value: {{ .Values.weather_api_key }}
         ports:
         - containerPort: 5000
 ---
