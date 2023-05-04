@@ -2,14 +2,12 @@ import sys
 sys.path.append('.')
 
 import datetime as dt
-import json
-import requests
 import os
 import json
 from serving.predictions_builder import build_predictions
 from flask import Flask, jsonify, request
 
-API_TOKEN = "authtoken"
+API_TOKEN = os.env("APP_AUTH_TOKEN")
 LAST_MODEL_TRAINED = dt.datetime(2023, 4, 24, 16, 20, 0)
 PREDICTIONS_PATH = "/app/data/predictions/"
 
