@@ -2,3 +2,5 @@ flask
 requests
 numpy
 tensorflow
+pandas
+sklearn

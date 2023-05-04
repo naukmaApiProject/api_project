@@ -20,5 +20,9 @@ RUN chmod 0644 cronjobs/cronjob_build_predictions && \
     crontab cronjobs/cronjob_build_predictions && \
     touch /var/log/cron.log
 
+RUN chmod 0644 cronjobs/cronjob_train_model && \
+    crontab cronjobs/cronjob_train_model && \
+    touch /var/log/cron.log
+
 # Run the Flask server
 CMD [ "flask", "--app", "api/predictions_endpoint.py", "run"]

@@ -13,11 +13,8 @@ from utils.regions import get_region_id
 
 API_KEY = os.getenv("WEATHER_API_KEY")
 
-MODEL_FILE = 'model/model2.h5'
 THRESHOLD = 0.5
-MODEL_FILE = 'model/model2.h5'
-THRESHOLD = 0.5
-regions = ["Kyiv", "Vinnytsia", "Lutsk", "Dnipro", "Donetsk", "Zhytomyr", "Uzhhorod", 
+regions = ["Kyiv", "Vinnytsia", "Lutsk", "Dnipro", "Donetsk", "Zhytomyr", "Uzhhorod",
            "Zaporizhzhia", "Ivano-Frankivsk", "Kropyvnytskyi", "Luhansk", "Lviv", "Mykolaiv",
            "Odesa", "Poltava", "Rivne", "Simferopol", "Sumy", "Ternopil", "Kharkiv", "Kherson", 
            "Khmelnytskyi", "Cherkasy", "Chernivtsi", "Chernihiv"];
