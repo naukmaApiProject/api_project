@@ -1,3 +1,7 @@
+## Requirements
+
+* k8s cluster
+
 ## Run
 
 Helm way
@@ -9,6 +13,6 @@ K8s way
 * to uninstall ```kubectl delete -f k8s/bare/app.yaml; kubectl delete -f k8s/bare/app-service.yaml;```
 
 Docker way
-* to run ```docker run -p 5000:5000 vampir/api-app```
+* to run ```docker run -p 5000:5000 -e e ENV_VARS vampir/api-app```
 
 P.S. Dont forget to apply env vars first !
